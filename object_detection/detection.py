@@ -2,11 +2,6 @@
 Source: https://github.com/balancap/SSD-Tensorflow
 '''
 
-
-import os
-import math
-import random
-
 import numpy as np
 import tensorflow as tf
 import cv2
@@ -20,7 +15,6 @@ sys.path.append('./')
 
 from nets import ssd_vgg_512, ssd_common, np_methods
 from preprocessing import ssd_vgg_preprocessing
-from notebooks import visualization
 
 # TensorFlow session: grow memory when needed. TF, DO NOT USE ALL MY GPU MEMORY!!!
 gpu_options = tf.GPUOptions(allow_growth=True)
@@ -43,7 +37,7 @@ with slim.arg_scope(ssd_net.arg_scope(data_format=data_format)):
     predictions, localisations, _, _ = ssd_net.net(image_4d, is_training=False, reuse=reuse)
 
 # Restore SSD model.
-ckpt_filename = './checkpoints/VGG_VOC0712_SSD_512x512_ft_iter_120000.ckpt'
+ckpt_filename = 'object_detection/checkpoints/VGG_VOC0712_SSD_512x512_ft_iter_120000.ckpt'
 isess.run(tf.global_variables_initializer())
 saver = tf.train.Saver()
 saver.restore(isess, ckpt_filename)
@@ -72,12 +66,14 @@ def process_image(img, select_threshold=0.5, nms_threshold=.45, net_shape=(512, 
 def detection(img):
 
     #img = mpimg.imread(path + image_names[-1])
+
     rclasses, rscores, rbboxes =  process_image(img)
 
     # visualization.bboxes_draw_on_img(img, rclasses, rscores, rbboxes, visualization.colors_plasma)
-    #visualization.plt_bboxes(img, rclasses, rscores, rbboxes)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    #img_overlay = visualization.plt_bboxes(img, rclasses, rscores, rbboxes)
 
-    return(rbboxes,rclasses,rscores)
+    return (rbboxes,rclasses,rscores)
 
 
 
