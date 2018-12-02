@@ -44,10 +44,16 @@ saver.restore(isess, ckpt_filename)
 
 # SSD default anchor boxes.
 ssd_anchors = ssd_net.anchors(net_shape)
+ops = isess.graph.get_operations()
+for op in ops:
+    print(op.values)
 
 # Main image processing routine.
-def process_image(img, select_threshold=0.5, nms_threshold=.45, net_shape=(512, 512)):
+def process_image(img, output_tensor=None, select_threshold=0.5, nms_threshold=.45, net_shape=(512, 512)):
     # Run SSD network.
+    if output_tensor is not None:
+        return isess.run([output_tensor], feed_dict={img_input: img})
+
     rimg, rpredictions, rlocalisations, rbbox_img = isess.run([image_4d, predictions, localisations, bbox_img],
                                                               feed_dict={img_input: img})
     
@@ -63,17 +69,27 @@ def process_image(img, select_threshold=0.5, nms_threshold=.45, net_shape=(512, 
     rbboxes = np_methods.bboxes_resize(rbbox_img, rbboxes)
     return rclasses, rscores, rbboxes
 
-def detection(img):
 
-    #img = mpimg.imread(path + image_names[-1])
 
-    rclasses, rscores, rbboxes =  process_image(img)
+def detection(img, layer=None):
+    """
 
-    # visualization.bboxes_draw_on_img(img, rclasses, rscores, rbboxes, visualization.colors_plasma)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    #img_overlay = visualization.plt_bboxes(img, rclasses, rscores, rbboxes)
+    :param img: image to feed to neural net
+    :param layer: output layer that should be returned. Defualt is None. This means (rbboxes,rclasses,rscores) is returned
+    :return:
+    """
+    if layer is not None:
+        out = tf.get_default_graph().get_tensor_by_name(layer)
+        output = process_image(img, out)
+        return output
+    else:
+        rclasses, rscores, rbboxes = process_image(img)
 
-    return (rbboxes,rclasses,rscores)
+        # visualization.bboxes_draw_on_img(img, rclasses, rscores, rbboxes, visualization.colors_plasma)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        #img_overlay = visualization.plt_bboxes(img, rclasses, rscores, rbboxes)
+
+        return (rbboxes,rclasses,rscores)
 
 
 
