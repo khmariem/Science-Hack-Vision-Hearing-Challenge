@@ -102,8 +102,8 @@ def plt_bboxes(img, classes, scores, bboxes, figsize=(10,10), linewidth=1.5):
             ymax = int(bboxes[i, 2] * height)
             xmax = int(bboxes[i, 3] * width)
 
-            img = cv2.rectangle(img, (xmin, ymin), (xmax - xmin, ymax - ymin), (0, 255, 0), 5)
-
+            #img = cv2.rectangle(img, (xmin, ymin), (xmax - xmin, ymax - ymin), (0, 255, 0), 5)
+            img = cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 5)
             """rect = plt.Rectangle((xmin, ymin), xmax - xmin,
                                  ymax - ymin, fill=False,
                                  edgecolor=colors[cls_id],

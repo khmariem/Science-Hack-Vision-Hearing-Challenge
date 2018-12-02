@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 from threading import Thread, Lock
 import numpy as np
@@ -11,7 +10,7 @@ from object_detection.notebooks import visualization
 from object_detection.feat import FeatureVectors
 
 class WebcamVideoStream :
-    def __init__(self, src = 0, width = 320, height = 240) :
+    def __init__(self, src=0, width=320, height = 240) :
         self.stream = cv2.VideoCapture(src)
         self.stream.set(3, width)
         self.stream.set(4, height)
