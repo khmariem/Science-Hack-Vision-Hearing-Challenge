@@ -8,6 +8,8 @@ sys.path.append("./object_detection")
 import matplotlib.pyplot as plt
 from object_detection.notebooks import visualization
 from object_detection.feat import FeatureVectors
+from audio import mix
+from subprocess import Popen
 
 class WebcamVideoStream :
     def __init__(self, src=0, width=320, height = 240) :
@@ -51,21 +53,30 @@ class WebcamVideoStream :
 if __name__ == "__main__" :
     vs = WebcamVideoStream().start()
     fv = FeatureVectors().start()
+    processes = []
     while True :
         frame = vs.read()
         fv = fv.update(frame)
 
         features, rbboxes, rclasses, rscores = fv.read()
-
+        # print(features)
+        # print(rclasses)
+        if processes: 
+            for p in processes: p.kill()
+            processes = []
+        for f,rcl in zip(features,rclasses):
+            n = mix(f,rcl)
+            processes.append(Popen(['ffplay', "-nodisp", "-autoexit", "-hide_banner", n]))
+        
         print(rbboxes)
         img = visualization.plt_bboxes(frame, rclasses, rscores, rbboxes)
         cv2.imshow('webcam', img)
         if cv2.waitKey(1) == 27 :
             break
-
     fv.stop()   
     vs.stop()
     cv2.destroyAllWindows()
+    p.kill()
 
 
 
