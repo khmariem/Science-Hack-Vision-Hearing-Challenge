@@ -39,10 +39,10 @@ class FeatureVectors :
 
     def read(self) :
         self.read_lock.acquire()
-        features = self.features
-        rbboxes = self.rbboxes
-        rclasses = self.rclasses
-        rscores = self.rscores
+        features = self.features.copy()
+        rbboxes = self.rbboxes.copy()
+        rclasses = self.rclasses.copy()
+        rscores = self.rscores.copy()
         self.read_lock.release()
         return features, rbboxes, rclasses, rscores
 
