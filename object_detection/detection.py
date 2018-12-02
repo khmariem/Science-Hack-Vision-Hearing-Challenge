@@ -52,9 +52,9 @@ for op in ops:
 def process_image(img, output_tensor=None, select_threshold=0.5, nms_threshold=.45, net_shape=(512, 512)):
     # Run SSD network.
     if output_tensor is not None:
-        return isess.run([output_tensor], feed_dict={img_input: img})
-
-    rimg, rpredictions, rlocalisations, rbbox_img = isess.run([image_4d, predictions, localisations, bbox_img],
+        rimg, rpredictions, rlocalisations, rbbox_img, output = isess.run([image_4d, predictions, localisations, bbox_img, output_tensor], feed_dict={img_input: img})
+    else:
+        rimg, rpredictions, rlocalisations, rbbox_img = isess.run([image_4d, predictions, localisations, bbox_img],
                                                               feed_dict={img_input: img})
     
     # Get classes and bboxes from the net outputs.
@@ -67,7 +67,7 @@ def process_image(img, output_tensor=None, select_threshold=0.5, nms_threshold=.
     rclasses, rscores, rbboxes = np_methods.bboxes_nms(rclasses, rscores, rbboxes, nms_threshold=nms_threshold)
     # Resize bboxes to original image shape. Note: useless for Resize.WARP!
     rbboxes = np_methods.bboxes_resize(rbbox_img, rbboxes)
-    return rclasses, rscores, rbboxes
+    return rclasses, rscores, rbboxes, output
 
 
 
@@ -78,18 +78,13 @@ def detection(img, layer=None):
     :param layer: output layer that should be returned. Defualt is None. This means (rbboxes,rclasses,rscores) is returned
     :return:
     """
+    out = None
     if layer is not None:
         out = tf.get_default_graph().get_tensor_by_name(layer)
-        output = process_image(img, out)
-        return output
-    else:
-        rclasses, rscores, rbboxes = process_image(img)
 
-        # visualization.bboxes_draw_on_img(img, rclasses, rscores, rbboxes, visualization.colors_plasma)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        #img_overlay = visualization.plt_bboxes(img, rclasses, rscores, rbboxes)
+    rclasses, rscores, rbboxes, output = process_image(img, out)
 
-        return (rbboxes,rclasses,rscores)
+    return (rbboxes,rclasses,rscores, output)
 
 
 
