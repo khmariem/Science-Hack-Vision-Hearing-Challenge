@@ -12,7 +12,7 @@ from audio import mix
 from subprocess import Popen
 
 class WebcamVideoStream :
-    def __init__(self, src=0, width=320, height = 240) :
+    def __init__(self, src=1, width=300, height=200) :
         self.stream = cv2.VideoCapture(src)
         self.stream.set(3, width)
         self.stream.set(4, height)
@@ -64,21 +64,20 @@ if __name__ == "__main__" :
             features, rbboxes, rclasses, rscores = fv.read()
             # print(features)
             # print(rclasses)
-            for f,rcl in zip(features,rclasses):
+            for f, rcl in zip(features,rclasses):
                 names.append(mix(f,rcl))
-            for n in names:
-                processes.append(Popen(['ffplay', "-nodisp", "-autoexit", "-hide_banner", n]))
-            
-            
-            if oldprocesses: 
-                for p in oldprocesses: p.kill()
-                oldprocesses = processes
+            if processes:
+                for p in processes: p.kill()
+                # oldprocesses = processes
                 processes = []
-            
-            print(rbboxes)
+            for n in names:
+                print(n)
+                processes.append(Popen(['ffplay', "-nodisp", "-autoexit", "-hide_banner", n]))
+
+            print("rboxes: " + str(rbboxes))
             img = visualization.plt_bboxes(frame, rclasses, rscores, rbboxes)
             cv2.imshow('webcam', img)
-            if cv2.waitKey(1) == 27 :
+            if cv2.waitKey(1) == 27:
                 break
     except Exception as e:
         fv.stop()   
@@ -86,6 +85,7 @@ if __name__ == "__main__" :
         cv2.destroyAllWindows()
         for p in processes: p.kill()
         for p in oldprocesses: p.kill()
+        raise e
     fv.stop()   
     vs.stop()
     cv2.destroyAllWindows()
