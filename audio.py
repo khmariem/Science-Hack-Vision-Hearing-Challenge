@@ -25,9 +25,9 @@ def givewavs(folder):
                                         f[-3:]=='wav']
 
 MUSIC_FOLDERS = ['wav']
-# BEAT_FOLDERS=[r'wav\Adrien Fertier_Lo-fi Rock\Loop',]
-                # r'wav\Hackathon\Background']
-# SINGLE_FOLDERS = [r'wav\Hackathon\Single', r'wav\Adrien Fertier_Lo-fi Rock\Single Hit']
+BEAT_FOLDERS=[r'wav\Adrien Fertier_Lo-fi Rock\Loop',
+                r'wav\Hackathon\Background']
+SINGLE_FOLDERS = [r'wav\Hackathon\Single', r'wav\Adrien Fertier_Lo-fi Rock\Single Hit']
 SINGLE_NUM = 4
 
 allsamples = []
@@ -62,7 +62,7 @@ def mix(arr,cl):
     t.export(n,format='wav')
     return n
 
-# def mix2(arr,cl):
+# def mix2(arr,cl,bbox):
     
 
 if __name__ == "__main__":
