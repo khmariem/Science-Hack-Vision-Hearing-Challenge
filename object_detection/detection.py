@@ -51,6 +51,7 @@ for op in ops:
 # Main image processing routine.
 def process_image(img, select_threshold=0.5, nms_threshold=.45, net_shape=(512, 512)):
     # Run SSD network.
+    print("image shape: " + str(img.shape))
     rimg, rpredictions, rlocalisations, rbbox_img = isess.run([image_4d, predictions, localisations, bbox_img],
                                                               feed_dict={img_input: img})
     
